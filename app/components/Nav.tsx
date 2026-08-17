@@ -10,6 +10,7 @@ const SECTIONS = [
   { id: 'projects', label: 'Projects' },
   { id: 'skills', label: 'Skills' },
   { id: 'certifications', label: 'Certifications' },
+  { id: 'sudoku', label: 'Sudoku' },
 ];
 
 export default function Nav() {
@@ -59,7 +60,10 @@ export default function Nav() {
             we were trying to avoid. The landmark disappears with the links,
             which is correct — there is no navigation to announce on a phone. */}
         <nav aria-label="Section navigation" className="hidden min-w-0 flex-1 lg:block">
-          <ul className="flex gap-1">
+          {/* Safety net: the seven labels leave only ~37px of headroom at lg, so
+              a longer real label would otherwise clip. No scrollbar appears
+              while everything fits. */}
+          <ul className="flex gap-1 overflow-x-auto">
             {SECTIONS.map(({ id, label }) => {
               const isActive = id === activeId;
               return (

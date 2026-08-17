@@ -6,6 +6,7 @@ import EducationSection from '@/components/EducationSection';
 import ProjectsSection from '@/components/ProjectsSection';
 import SkillsSection from '@/components/SkillsSection';
 import CertificationsSection from '@/components/CertificationsSection';
+import SudokuSection from '@/components/Sudoku/SudokuSection';
 
 export default function Page() {
   return (
@@ -19,6 +20,7 @@ export default function Page() {
         <ProjectsSection />
         <SkillsSection />
         <CertificationsSection />
+        <SudokuSection />
       </main>
     </>
   );

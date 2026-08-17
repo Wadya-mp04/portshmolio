@@ -184,11 +184,12 @@ section[id] {
 }
 
 /* Fades the pattern out toward the edges so it never reads as a bordered box
-   and never competes with the name for attention. */
+   and never competes with the name for attention. The focal point sits at 75%
+   — densest on the outer edge, dissolving toward the text column on the left. */
 .hero-pattern {
   position: relative;
   overflow: hidden;
-  mask-image: radial-gradient(115% 100% at 25% 50%, #000 20%, transparent 76%);
+  mask-image: radial-gradient(115% 100% at 75% 50%, #000 20%, transparent 76%);
 }
 
 /* Oversized so the drifting tile never exposes an edge. */

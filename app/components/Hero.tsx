@@ -6,15 +6,11 @@ export default function Hero() {
       // min-h-svh rather than h-screen: `svh` is the viewport with mobile browser
       // chrome showing, so the section can't overflow when the URL bar retracts,
       // and `min-` lets it grow if content ever exceeds one screen.
-      className="mx-auto grid min-h-svh w-full max-w-5xl items-center gap-10 px-6 py-24 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]"
+      // Text column takes the larger share; the pattern is support, not subject.
+      className="mx-auto grid min-h-svh w-full max-w-5xl items-center gap-10 px-6 py-24 md:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]"
     >
-      {/* Decorative only — the drifting pattern carries no information, and all
-          of its motion is defined inside a prefers-reduced-motion query. */}
-      <div aria-hidden="true" className="hero-pattern h-44 md:h-80">
-        <div className="hero-layer hero-layer--grid" />
-        <div className="hero-layer hero-layer--dots" />
-      </div>
-
+      {/* First in DOM order, so on a single-column phone layout the name leads
+          rather than being pushed below the decoration. */}
       <div>
         <p className="font-mono text-sm uppercase tracking-[0.2em] text-muted">Portfolio</p>
         {/* TODO: replace with real content */}
@@ -25,6 +21,13 @@ export default function Hero() {
           One line on what you build and who you build it for. Replace this with your
           own positioning statement.
         </p>
+      </div>
+
+      {/* Decorative only — the drifting pattern carries no information, and all
+          of its motion is defined inside a prefers-reduced-motion query. */}
+      <div aria-hidden="true" className="hero-pattern h-44 md:h-80">
+        <div className="hero-layer hero-layer--grid" />
+        <div className="hero-layer hero-layer--dots" />
       </div>
     </section>
   );

@@ -1,0 +1,229 @@
+@import "tailwindcss";
+
+/* next-themes writes `class="dark"` on <html>; Tailwind v4 needs to be told
+   that's the dark signal (v4 defaults to the prefers-color-scheme media query). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ---------------------------------------------------------------------------
+   Brand: sand #ead3aa / navy #182d3d — 9.7:1 against each other, both ways.
+   The two themes are strict inverses: light is sand-on-navy flipped, using the
+   full-saturation brand sand rather than a near-white tint of it.
+   Semantic tokens only below; components never reference a raw hex.
+   Contrast against --bg was computed, not eyeballed:
+     light  text 9.7:1   muted 5.1:1
+     dark   text 9.7:1   muted 5.5:1
+--------------------------------------------------------------------------- */
+
+:root {
+  color-scheme: light;
+  --bg: #ead3aa;
+  --text: #182d3d;
+  --accent: #182d3d;
+  --muted: rgb(24 45 61 / 0.75);
+  /* Internal, not exposed as a Tailwind utility: the hero pattern's line colour. */
+  --pattern-line: rgb(24 45 61 / 0.16);
+}
+
+.dark {
+  color-scheme: dark;
+  --bg: #182d3d;
+  --text: #ead3aa;
+  --accent: #ead3aa;
+  --muted: rgb(234 211 170 / 0.7);
+  --pattern-line: rgb(234 211 170 / 0.16);
+}
+
+/* Bridge the tokens into Tailwind's color scale, so `bg-background`,
+   `text-foreground`, `text-muted`, `border-accent` etc. all resolve per theme.
+   `inline` matters: it inlines `var(--bg)` into each utility rather than
+   snapshotting a value at build time, which is what lets the theme swap live. */
+@theme inline {
+  --color-background: var(--bg);
+  --color-foreground: var(--text);
+  --color-accent: var(--accent);
+  --color-muted: var(--muted);
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+/* One rule for both themes: navy on this mauve is 4.80:1, so it stays readable
+   whichever direction the theme is running. */
+::selection {
+  background-color: #b28e88;
+  color: #182d3d;
+}
+
+/* Anchor-link targets need to clear the sticky nav. */
+section[id] {
+  scroll-margin-top: 5rem;
+}
+
+/* ---------------------------------------------------------------------------
+   Theme cross-fade.
+
+   next-themes' `disableTransitionOnChange` is off, so this has to be
+   coordinated: one duration applied broadly, otherwise the background snaps
+   while text and borders lag and the swap looks ragged.
+
+   Specificity is doing real work here — `body *` is (0,0,1), so any element
+   carrying a Tailwind `transition` utility (0,1,0) keeps its own faster timing
+   for hover, and only falls back to this for theme changes.
+--------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: no-preference) {
+  body,
+  body * {
+    transition:
+      color 300ms ease,
+      background-color 300ms ease,
+      border-color 300ms ease;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Theme toggle.
+
+   Brackets are separate elements so they can spring outward on hover, and the
+   two words are stacked in a fixed-width slot so one can slide/fade out while
+   the other slides/fades in. Both word states are driven purely by the `.dark`
+   class, which keeps the no-hydration-mismatch property intact.
+--------------------------------------------------------------------------- */
+
+.tt-bracket {
+  display: inline-block;
+}
+
+.tt-slot {
+  position: relative;
+  display: inline-block;
+  /* Widest label is "Too Bright ?" at 12 characters; fixed so nothing reflows. */
+  width: 12ch;
+  height: 1.25rem; /* matches text-sm line-height */
+  vertical-align: bottom;
+}
+
+.tt-word {
+  position: absolute;
+  left: 0;
+  right: 0;
+  text-align: center;
+}
+
+/* Light theme: "Too Bright ?" is resting, "Too Dark ?" waits below. */
+.tt-word--bright {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.tt-word--dark {
+  opacity: 0;
+  transform: translateY(0.55em);
+}
+
+/* Dark theme: they swap, the outgoing one leaving upward. */
+.dark .tt-word--bright {
+  opacity: 0;
+  transform: translateY(-0.55em);
+}
+
+.dark .tt-word--dark {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Overshooting curve — the "spring" is entirely in this bezier. */
+  .tt-bracket {
+    transition: transform 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .tt:hover .tt-bracket--left,
+  .tt:focus-visible .tt-bracket--left {
+    transform: translateX(-3px);
+  }
+
+  .tt:hover .tt-bracket--right,
+  .tt:focus-visible .tt-bracket--right {
+    transform: translateX(3px);
+  }
+
+  .tt-word {
+    transition:
+      opacity 220ms ease,
+      transform 220ms ease,
+      color 300ms ease;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Hero pattern — decorative, aria-hidden in markup.
+   Animates transform/opacity only (compositor-friendly, no layout thrash).
+   The animation is *only* declared inside the no-preference query, so
+   `prefers-reduced-motion: reduce` leaves a completely static pattern.
+--------------------------------------------------------------------------- */
+
+@keyframes hero-drift {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-56px, -56px, 0);
+  }
+}
+
+@keyframes hero-breathe {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+/* Fades the pattern out toward the edges so it never reads as a bordered box
+   and never competes with the name for attention. */
+.hero-pattern {
+  position: relative;
+  overflow: hidden;
+  mask-image: radial-gradient(115% 100% at 25% 50%, #000 20%, transparent 76%);
+}
+
+/* Oversized so the drifting tile never exposes an edge. */
+.hero-layer {
+  position: absolute;
+  inset: -25%;
+  will-change: transform;
+}
+
+/* Both tile sizes divide the 56px drift distance evenly, so each animation
+   cycle lands exactly on the tile boundary and the loop is seamless. */
+.hero-layer--grid {
+  background-image:
+    repeating-linear-gradient(to right, var(--pattern-line) 0 1px, transparent 1px 56px),
+    repeating-linear-gradient(to bottom, var(--pattern-line) 0 1px, transparent 1px 56px);
+}
+
+.hero-layer--dots {
+  background-image: radial-gradient(var(--pattern-line) 1.5px, transparent 1.6px);
+  background-size: 28px 28px;
+  opacity: 0.55;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  .hero-layer--grid {
+    animation: hero-drift 34s linear infinite;
+  }
+
+  .hero-layer--dots {
+    animation:
+      hero-drift 56s linear infinite reverse,
+      hero-breathe 16s ease-in-out infinite;
+  }
+}

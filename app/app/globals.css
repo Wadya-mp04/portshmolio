@@ -391,7 +391,7 @@ section[id] {
      BackgroundCanvas at -z-10. */
   .xp-logo {
     position: absolute;
-    right: calc(100% + 2rem);
+    right: calc(100% - 7rem);
     top: 50%;
     translate: 0 -50%;
     /* Far wider than the space to its left, so it runs off the screen edge.
@@ -409,7 +409,7 @@ section[id] {
 /* Room to grow once the viewport is wide enough to absorb it. */
 @media (min-width: 90rem) and (prefers-reduced-motion: no-preference) {
   .xp-logo {
-    right: calc(100% + 4rem);
+    right: calc(100% - 10rem);
     width: 84rem;
     height: 84rem;
   }

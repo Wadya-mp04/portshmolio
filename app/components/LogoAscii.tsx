@@ -107,7 +107,7 @@ export default function LogoAscii({ src }: Props) {
     //   0.13  ->  174x174 grid, 15k chars/frame, 15.4px glyphs  <- here
     //   0.19  ->  255x255 grid, 32k chars/frame, 10.5px glyphs (drops frames)
     const effect = ASCII
-      ? new AsciiEffect(renderer, CHARSET, { invert: false, resolution: 0.13 })
+      ? new AsciiEffect(renderer, CHARSET, { invert: false, resolution: 0.17 })
       : null;
 
     if (effect) {

@@ -1,54 +1,46 @@
 import experience from '@/content/experience';
-import { formatRange } from '@/lib/format';
+import ExperienceScroller from '@/components/ExperienceScroller';
 
+/**
+ * Stays a Server Component and passes the roles down as props. Importing the
+ * content module from inside the client component would pull Zod into the
+ * browser bundle for validation that already ran at build time.
+ */
 export default function ExperienceSection() {
   return (
     <section
       id="experience"
       aria-label="Experience"
-      className="mx-auto w-full max-w-5xl px-6 py-16"
+      // Full-bleed, with the max-w-5xl wrapper moved inside. The logo bleeds
+      // left of the content column, and clipping on a centred 1024px box would
+      // slice it mid-page; clipping here puts the boundary at the viewport edge.
+      //
+      // overflow-x-clip, not -hidden: `clip` creates no scroll container, so the
+      // sticky heading and stage inside still resolve against the viewport.
+      // `hidden` would make this their scroll container and break both.
+      className="w-full overflow-x-clip py-16"
     >
-      <h2 className="font-mono text-sm uppercase tracking-[0.2em] text-muted">Experience</h2>
+      <div className="mx-auto w-full max-w-5xl px-6">
+        {/* 19rem, not 14rem: "./EXPERIENCE" is 12 characters, and at text-3xl
+            with 0.2em tracking a mono glyph advances ~24px — ~288px of label.
+            gap-20 pushes the timeline further from it. */}
+        <div className="lg:grid lg:grid-cols-[minmax(0,19rem)_minmax(0,1fr)] lg:gap-20">
+        {/* Pinned alongside the roles. `self-start` is load-bearing: grid items
+            stretch to the row height by default, and an element as tall as its
+            container has no slack to stick within.
+            The motion-safe:lg: pair scopes the larger type and deeper offset to
+            the scroll-jacked view only — it matches the media query in
+            globals.css that turns the timeline into the pinned stage. */}
+        {/* z-10 keeps the heading above the logo, which is absolutely positioned
+            out of the scroller and over this column. Both are position: sticky,
+            so without it DOM order would paint the logo on top. */}
+          <div className="relative z-10 lg:sticky lg:top-24 lg:self-start motion-safe:lg:top-36">
+            <h2 className="section-heading">./Experience</h2>
+          </div>
 
-      {/* Ordered: the sequence of roles is meaningful. */}
-      <ol className="mt-6 space-y-4">
-        {experience.map((role) => (
-          <li
-            key={`${role.company}-${role.start}`}
-            className="rounded-lg border border-foreground/15 bg-foreground/[0.04] p-5"
-          >
-            <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-              <h3 className="text-lg font-semibold text-foreground">{role.role}</h3>
-              <p className="font-mono text-xs text-muted">
-                <time dateTime={role.start}>{formatRange(role.start, role.end)}</time>
-              </p>
-            </div>
-
-            <p className="mt-1 text-sm text-muted">
-              {role.company} · {role.location}
-            </p>
-
-            <ul className="mt-4 list-disc space-y-1.5 pl-5 text-foreground marker:text-muted">
-              {role.bullets.map((bullet) => (
-                <li key={bullet}>{bullet}</li>
-              ))}
-            </ul>
-
-            {role.tech.length > 0 && (
-              <ul className="mt-4 flex flex-wrap gap-2" aria-label="Technologies used">
-                {role.tech.map((item) => (
-                  <li
-                    key={item}
-                    className="rounded border border-foreground/15 px-2 py-0.5 font-mono text-xs text-muted"
-                  >
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </li>
-        ))}
-      </ol>
+          <ExperienceScroller roles={experience} />
+        </div>
+      </div>
     </section>
   );
 }

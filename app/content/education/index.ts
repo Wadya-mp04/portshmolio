@@ -1,14 +1,32 @@
 import { educationSchema, validate, type Education } from '@/content/types';
 
 const entries: Education[] = [
-  // TODO: replace with real content
   {
-    institution: 'Institution Name',
-    credential: 'Degree or Credential',
-    field: 'Field of Study',
-    start: '2016-09',
-    end: '2020-06',
-    notes: 'Optional line for honours, thesis, or focus area.',
+    institution: 'Concordia University',
+    // `field` omitted: the credential already names it.
+    credential: 'Bachelor of Computer Science',
+    location: 'Montreal, QC',
+    start: '2023-09',
+    end: null, // null renders as "Present"
+    coursework: [
+      'Data Structures & Algorithms',
+      'Operating Systems',
+      'Computer Networks',
+      'Databases',
+      'Information Retrieval',
+      'Computer Vision',
+      'Web Development',
+    ],
+    notes: 'GPA: 3.6/4.3',
+  },
+  {
+    institution: 'American University of Sharjah',
+    credential: 'Bachelor of Computer Science',
+    location: 'Sharjah, UAE',
+    start: '2022-09',
+    end: '2023-04',
+    coursework: [],
+    notes: 'GPA: 3.9/4.0',
   },
 
   // ← add a new qualification here (newest first)

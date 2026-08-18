@@ -8,9 +8,7 @@ export default function CertificationsSection() {
       aria-label="Certifications"
       className="mx-auto w-full max-w-5xl px-6 py-16"
     >
-      <h2 className="font-mono text-sm uppercase tracking-[0.2em] text-muted">
-        Certifications
-      </h2>
+      <h2 className="section-heading">./Certifications</h2>
 
       <ul className="mt-6 grid gap-4 sm:grid-cols-2">
         {certifications.map((cert) => (

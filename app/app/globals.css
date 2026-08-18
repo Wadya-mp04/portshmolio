@@ -225,6 +225,218 @@ section[id] {
   }
 }
 
+/* ---------------------------------------------------------------------------
+   Experience scroller — two presentations from one DOM.
+
+   Base (below lg, or prefers-reduced-motion, or before hydration):
+     a vertical timeline — connector rule plus a circular marker per role, the
+     active one filled. Every role is visible and reachable. This is also what
+     search engines and the static export see.
+
+   lg + motion:
+     the track grows to 100svh per role and the stage pins to the viewport, so
+     scrolling swaps which role is shown rather than moving the page content.
+     JS writes --xp-fill (0..1) and data-state; all the layout lives here.
+--------------------------------------------------------------------------- */
+
+/* One definition for every section heading, so they can't drift apart.
+   Sized against the longest label: "./CERTIFICATIONS" is 16 characters, and a
+   mono glyph at text-3xl with 0.2em tracking advances ~24px — 384px, which
+   overflows a phone. text-2xl (~307px) fits, so the larger size waits for sm. */
+.section-heading {
+  @apply font-mono text-2xl uppercase tracking-[0.2em] text-muted sm:text-3xl;
+}
+
+/* --- shared vertical timeline -------------------------------------------- */
+/* Used by Education as-is, and by Experience as its unpinned presentation. */
+
+.tl-item {
+  --tl-marker-size: 9px;
+  --tl-marker-top: 0.7rem;
+  /* Marker centre, measured from the item's top edge. The rail and the marker
+     both derive from this, so they cannot drift apart. */
+  --tl-marker-mid: calc(var(--tl-marker-top) + var(--tl-marker-size) / 2);
+
+  position: relative;
+  padding-left: 2rem;
+  padding-bottom: 3.5rem;
+}
+
+.tl-item:last-child {
+  padding-bottom: 0;
+}
+
+/* The rail is a pseudo-element, not a border. A border spans the item's whole
+   height, so it overshot above the first marker and stopped short of the last
+   by exactly --tl-marker-mid. As a pseudo-element both ends can be trimmed. */
+.tl-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background-color: color-mix(in oklab, var(--accent) 25%, transparent);
+}
+
+.tl-item:first-child::before {
+  top: var(--tl-marker-mid);
+}
+
+.tl-item:last-child::before {
+  bottom: auto;
+  height: var(--tl-marker-mid);
+}
+
+/* A lone entry has nothing to connect to. */
+.tl-item:first-child:last-child::before {
+  display: none;
+}
+
+.tl-marker {
+  position: absolute;
+  /* 0.5px is the rail's centre — it is 1px wide at left: 0. */
+  left: calc(0.5px - var(--tl-marker-size) / 2);
+  top: var(--tl-marker-top);
+  width: var(--tl-marker-size);
+  height: var(--tl-marker-size);
+  border-radius: 9999px;
+  border: 1px solid var(--accent);
+  background-color: var(--bg);
+  transition: background-color 200ms ease;
+}
+
+/* Hover-driven, not scroll-driven.
+   Scroll activation lit every marker up to the current one rather than just
+   one, and "currently viewed" is not a meaningful state for a static list.
+   Guarded on (hover: hover) and (pointer: fine) so touch devices — where
+   :hover sticks after a tap — get no active state at all. */
+@media (hover: hover) and (pointer: fine) {
+  .tl-item:hover .tl-marker {
+    background-color: var(--accent);
+  }
+}
+
+/* The progress line belongs to pinned mode only. */
+.xp-progress {
+  display: none;
+}
+
+/* --- lg + motion: pinned scroller ---------------------------------------- */
+
+@media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
+  .xp-track {
+    height: calc(var(--xp-count) * 100svh);
+  }
+
+  .xp-stage {
+    position: sticky;
+    top: 0;
+    display: grid;
+    align-items: center;
+    height: 100svh;
+  }
+
+  /* Every role occupies the same grid cell, so the stage is as tall as the
+     longest role and nothing reflows when the active one changes. */
+  .xp-list {
+    display: grid;
+  }
+
+  /* Every rule below is scoped under .xp-track. The timeline classes are shared
+     with Education, which must keep its plain stacked behaviour — an unscoped
+     rule here would stack its entries and hide all but one. */
+  .xp-track .tl-item::before {
+    display: none;
+  }
+
+  .xp-track .tl-item {
+    grid-area: 1 / 1;
+    padding-left: 3rem;
+    padding-bottom: 0;
+    transition:
+      opacity 350ms ease,
+      transform 350ms ease;
+  }
+
+  .xp-track .tl-marker {
+    display: none;
+  }
+
+  /* Direction matters: roles already passed leave upward, roles still to come
+     wait below. A single "inactive" state would make the outgoing role sink. */
+  .xp-track .tl-item[data-state='before'] {
+    opacity: 0;
+    transform: translateY(-1.25rem);
+    pointer-events: none;
+  }
+
+  .xp-track .tl-item[data-state='after'] {
+    opacity: 0;
+    transform: translateY(1.25rem);
+    pointer-events: none;
+  }
+
+  .xp-track .tl-item[data-state='active'] {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* The ASCII logo. Colour is inherited, which is the whole reason for the
+     ASCII treatment — no material or lighting swap on theme change. */
+  /* Sits to the LEFT of the progress line, over the label column.
+     Absolutely positioned, so it occupies no space and cannot shift anything.
+     Layering is by DOM order, not z-index: it precedes <ol> inside the stage,
+     so role text paints over it, while the whole stage sits above the fixed
+     BackgroundCanvas at -z-10. */
+  .xp-logo {
+    position: absolute;
+    right: calc(100% + 2rem);
+    top: 50%;
+    translate: 0 -50%;
+    /* Far wider than the space to its left, so it runs off the screen edge.
+       The full-bleed section clips it at the viewport. */
+    width: 68rem;
+    height: 68rem;
+    color: var(--accent);
+    opacity: 0.85;
+    line-height: 1;
+    user-select: none;
+    pointer-events: none;
+  }
+}
+
+/* Room to grow once the viewport is wide enough to absorb it. */
+@media (min-width: 90rem) and (prefers-reduced-motion: no-preference) {
+  .xp-logo {
+    right: calc(100% + 4rem);
+    width: 84rem;
+    height: 84rem;
+  }
+
+  /* Thin, long, square-ended. Inset symmetrically to ~2/3 of the viewport so it
+     reads as a long rule without running edge to edge. The stage is exactly
+     100svh, so svh insets here are viewport fractions. */
+  .xp-progress {
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 17svh;
+    bottom: 17svh;
+    width: 1px;
+    background-color: color-mix(in oklab, var(--accent) 22%, transparent);
+  }
+
+  .xp-progress::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-color: var(--accent);
+    transform-origin: top;
+    transform: scaleY(var(--xp-fill, 0));
+  }
+}
+
 /* The hero's CSS pattern was replaced by HeroCanvas, so its layers, masks and
    keyframes are gone. The reduced-motion guard stays for smooth scrolling. */
 @media (prefers-reduced-motion: no-preference) {

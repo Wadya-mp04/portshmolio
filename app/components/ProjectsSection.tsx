@@ -7,7 +7,7 @@ export default function ProjectsSection() {
       aria-label="Projects"
       className="mx-auto w-full max-w-5xl px-6 py-16"
     >
-      <h2 className="font-mono text-sm uppercase tracking-[0.2em] text-muted">Projects</h2>
+      <h2 className="section-heading">./Projects</h2>
 
       <ul className="mt-6 grid gap-4 sm:grid-cols-2">
         {projects.map((project) => (

@@ -5,11 +5,11 @@ export default function About() {
     <section
       id="about"
       aria-label="About"
-      className="mx-auto flex min-h-svh w-full max-w-5xl flex-col justify-center px-6 py-16"
+      className="mx-auto w-full max-w-5xl px-6 py-24"
     >
       {/* The window chrome reads as a title, but "manifesto.sh — 80x24" is a bad
           heading to land on when navigating by headings. */}
-      <h2 className="sr-only">About</h2>
+      <h2 className="sr-only">./About</h2>
 
       <div className="terminal mx-auto w-full max-w-3xl rounded-lg p-6 font-mono text-sm sm:p-10 sm:text-base">
         {/* Chrome: decorative in full. */}

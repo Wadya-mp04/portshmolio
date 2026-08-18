@@ -29,7 +29,7 @@ export default function SudokuSection() {
       aria-label="Daily Sudoku"
       className="mx-auto w-full max-w-5xl px-6 py-16"
     >
-      <h2 className="font-mono text-sm uppercase tracking-[0.2em] text-muted">Daily Sudoku</h2>
+      <h2 className="section-heading">./Sudoku</h2>
       <p className="mt-3 max-w-prose text-muted">
         A fresh puzzle each day. Your time is recorded against an anonymous id stored in
         your browser — no account, no personal data.

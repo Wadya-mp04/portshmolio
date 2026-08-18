@@ -1,4 +1,12 @@
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 import { z } from 'zod';
+
+/**
+ * NOTE: this module is server-only — the `node:fs` check below cannot run in a
+ * browser. Client components must import from here with `import type`, which is
+ * erased at compile time. A value import from a client component breaks the build.
+ */
 
 /* ---------------------------------------------------------------------------
    The mini-CMS contract.
@@ -25,14 +33,38 @@ export const experienceSchema = z.object({
   end: yearMonth.nullable(),
   bullets: z.array(nonEmpty('bullet')).min(1, 'list at least one bullet'),
   tech: z.array(nonEmpty('tech')),
+  /**
+   * Company logo, extruded into a rotating 3D form beside the role.
+   * Path is relative to public/. Omit for roles with no artwork.
+   *
+   * The refine is the point: a regex only proves the string *looks* like a
+   * path, so a renamed file would still build and 404 at runtime. Checking the
+   * filesystem fails the build instead, naming the missing file.
+   */
+  logo: z
+    .string()
+    .regex(/^\/logos\/.+\.svg$/, 'expected a path like "/logos/name.svg"')
+    // Zod 4 takes the message via `error`, which may be a function of the issue.
+    // A bare callback as the second argument is the Zod 3 API and no longer types.
+    .refine((path) => existsSync(join(process.cwd(), 'public', path)), {
+      error: (issue) => `no such file: public${issue.input}`,
+    })
+    .optional(),
 });
 
 export const educationSchema = z.object({
   institution: nonEmpty('institution'),
   credential: nonEmpty('credential'),
-  field: nonEmpty('field'),
+  /**
+   * Optional: degree names like "Bachelor of Computer Science" already name the
+   * field, and appending it again reads as a stutter.
+   */
+  field: nonEmpty('field').optional(),
+  location: nonEmpty('location'),
   start: yearMonth,
   end: yearMonth.nullable(),
+  /** Rendered as tags, same treatment as `tech` on Experience. May be empty. */
+  coursework: z.array(nonEmpty('course')),
   notes: nonEmpty('notes').optional(),
 });
 

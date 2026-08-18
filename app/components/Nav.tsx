@@ -45,8 +45,13 @@ export default function Nav() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-foreground/10 bg-background/80 backdrop-blur">
-      <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-4 px-6 py-2">
+    <header
+      // border-accent rather than a literal beige: --accent already resolves to
+      // the sand in dark mode, and to navy in light — where a beige rule would
+      // be invisible against the beige page. Drop to /50 if the line is loud.
+      className="sticky top-0 z-50 border-b border-accent bg-background/80 backdrop-blur"
+    >
+      <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-4 px-6 py-4">
         {/* #top is the hero section's id. */}
         <a
           href="#top"

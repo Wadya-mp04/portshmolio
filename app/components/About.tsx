@@ -1,16 +1,4 @@
-// Box-drawing characters rather than slashes and pipes, so the art needs no
-// escaping and survives copy/paste into the file intact.
-// TODO: replace with your own ASCII art
-const ASCII_ART = `
-  ┌─────────────────────────────┐
-  │ ▓▓▒▒░░               ░░▒▒▓▓ │
-  │ ▓▒░                     ░▒▓ │
-  │ ▓▒░     P L A C E       ░▒▓ │
-  │ ▓▒░       H O L D E R   ░▒▓ │
-  │ ▓▒░                     ░▒▓ │
-  │ ▓▓▒▒░░               ░░▒▒▓▓ │
-  └─────────────────────────────┘
-`;
+import about from '@/content/about';
 
 export default function About() {
   return (
@@ -19,30 +7,61 @@ export default function About() {
       aria-label="About"
       className="mx-auto flex min-h-svh w-full max-w-5xl flex-col justify-center px-6 py-16"
     >
-      <h2 className="font-mono text-sm uppercase tracking-[0.2em] text-muted">About</h2>
+      {/* The window chrome reads as a title, but "manifesto.sh — 80x24" is a bad
+          heading to land on when navigating by headings. */}
+      <h2 className="sr-only">About</h2>
 
-      <div className="mt-6 grid gap-10 md:grid-cols-[minmax(0,1fr)_auto] md:items-start">
-        {/* The real content lives here as ordinary prose, so assistive tech gets
-            actual text rather than having to interpret the artwork. */}
-        <div className="max-w-prose space-y-4 text-foreground">
-          {/* TODO: replace with real content */}
-          <p>
-            First paragraph of your bio. What you do, what you care about, and the kind
-            of problems you like working on.
-          </p>
-          <p>
-            Second paragraph. Background, current focus, or anything that gives a
-            visitor a reason to keep reading.
-          </p>
+      <div className="terminal mx-auto w-full max-w-3xl rounded-lg p-6 font-mono text-sm sm:p-10 sm:text-base">
+        {/* Chrome: decorative in full. */}
+        <div aria-hidden="true" className="terminal-dim mb-8 flex items-center gap-4">
+          <span className="flex gap-2">
+            <span className="size-2.5 rounded-full bg-current" />
+            <span className="size-2.5 rounded-full bg-current" />
+            <span className="size-2.5 rounded-full bg-current" />
+          </span>
+          <span className="text-xs uppercase tracking-[0.2em]">{about.window}</span>
         </div>
 
-        {/* Purely decorative: hidden from the accessibility tree entirely. */}
         <pre
           aria-hidden="true"
-          className="overflow-x-auto font-mono text-[0.6rem] leading-tight text-muted sm:text-xs"
+          className="terminal-dim mb-10 overflow-x-auto text-[0.5rem] leading-tight sm:text-xs"
         >
-          {ASCII_ART}
+          {about.banner}
         </pre>
+
+        <div className="space-y-8">
+          {about.commands.map((entry) => (
+            <div key={entry.command}>
+              <p>
+                {/* Only the prompt is hidden — "you@workstation:~$" read aloud is
+                    noise, whereas the command itself labels the output below it. */}
+                <span aria-hidden="true" className="terminal-dim">
+                  {about.prompt}{' '}
+                </span>
+                {entry.command}
+              </p>
+
+              {entry.style === 'quote' ? (
+                <blockquote className="terminal-quote mt-4 ml-2 space-y-3 pl-4 italic">
+                  {entry.output.map((line) => (
+                    <p key={line}>{line}</p>
+                  ))}
+                </blockquote>
+              ) : (
+                <div className="mt-4 ml-2 space-y-3 pl-4">
+                  {entry.output.map((line) => (
+                    <p key={line}>{line}</p>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+
+          {/* Trailing prompt with a blinking caret — pure flavour. */}
+          <p aria-hidden="true" className="terminal-dim">
+            {about.prompt} <span className="terminal-cursor" />
+          </p>
+        </div>
       </div>
     </section>
   );

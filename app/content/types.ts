@@ -59,11 +59,66 @@ export const certificationSchema = z.object({
   credentialUrl: z.url().optional(),
 });
 
+/** One `$ command` plus the output it prints, in the About terminal. */
+export const terminalCommandSchema = z.object({
+  command: nonEmpty('command'),
+  /** Each string renders as its own paragraph of output. */
+  output: z.array(nonEmpty('output line')).min(1, 'a command must print something'),
+  /** 'quote' renders the output as an indented, rule-marked blockquote. */
+  style: z.enum(['plain', 'quote']).optional(),
+});
+
+export const aboutSchema = z.object({
+  /** Title-bar text, e.g. "manifesto.sh — 80x24". */
+  window: nonEmpty('window'),
+  /** Shell prompt printed before every command. */
+  prompt: nonEmpty('prompt'),
+  /**
+   * Decorative ASCII banner, rendered aria-hidden.
+   * Deliberately not nonEmpty(): that trims, which would eat the leading
+   * whitespace that keeps ASCII art aligned.
+   */
+  banner: z.string().min(1, 'banner cannot be empty'),
+  commands: z.array(terminalCommandSchema).min(1, 'list at least one command'),
+});
+
+export type TerminalCommand = z.infer<typeof terminalCommandSchema>;
+export type About = z.infer<typeof aboutSchema>;
 export type Experience = z.infer<typeof experienceSchema>;
 export type Education = z.infer<typeof educationSchema>;
 export type Project = z.infer<typeof projectSchema>;
 export type SkillGroup = z.infer<typeof skillGroupSchema>;
 export type Certification = z.infer<typeof certificationSchema>;
+
+function fail(label: string, issues: string[]): never {
+  throw new Error(`Invalid content in ${label}:\n${issues.join('\n')}`);
+}
+
+/**
+ * Validates a single content object at module load — the array-free counterpart
+ * to validate(), for modules like content/about that export one object.
+ */
+export function validateOne<S extends z.ZodType>(
+  schema: S,
+  entry: unknown,
+  label: string,
+): z.infer<S> {
+  const result = schema.safeParse(entry);
+
+  if (!result.success) {
+    fail(
+      label,
+      result.error.issues.map((issue) => {
+        // Zod types `path` as PropertyKey[]; String() because implicit
+        // symbol→string conversion throws.
+        const path = issue.path.map(String).join('.') || '(root)';
+        return `  • ${path}: ${issue.message}`;
+      }),
+    );
+  }
+
+  return result.data;
+}
 
 /**
  * Validates a content array at module load.
@@ -80,17 +135,16 @@ export function validate<S extends z.ZodType>(
   const result = z.array(schema).safeParse(entries);
 
   if (!result.success) {
-    const issues = result.error.issues
-      .map((issue) => {
+    fail(
+      label,
+      result.error.issues.map((issue) => {
         // Zod types `path` as PropertyKey[], so entries may be symbols.
         // Implicit symbol→string conversion throws, hence the explicit String().
         const [index, ...rest] = issue.path;
         const field = rest.length ? rest.map(String).join('.') : '(entry)';
         return `  • entry [${String(index)}] → ${field}: ${issue.message}`;
-      })
-      .join('\n');
-
-    throw new Error(`Invalid content in ${label}:\n${issues}`);
+      }),
+    );
   }
 
   return result.data;

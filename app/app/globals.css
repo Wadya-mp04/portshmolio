@@ -20,8 +20,6 @@
   --text: #182d3d;
   --accent: #182d3d;
   --muted: rgb(24 45 61 / 0.75);
-  /* Internal, not exposed as a Tailwind utility: the hero pattern's line colour. */
-  --pattern-line: rgb(24 45 61 / 0.16);
 }
 
 .dark {
@@ -30,7 +28,6 @@
   --text: #ead3aa;
   --accent: #ead3aa;
   --muted: rgb(234 211 170 / 0.7);
-  --pattern-line: rgb(234 211 170 / 0.16);
 }
 
 /* Bridge the tokens into Tailwind's color scale, so `bg-background`,
@@ -44,8 +41,16 @@
   --color-muted: var(--muted);
 }
 
-body {
+/* The background sits on <html>, not <body>, on purpose. Painting order inside
+   the root stacking context is: root background → negative z-index descendants
+   → everything else. BackgroundCanvas lives at -z-10, so it draws above the
+   root background but beneath all content. If <body> also had a background it
+   would paint later and hide the canvas entirely. */
+html {
   background-color: var(--bg);
+}
+
+body {
   color: var(--text);
 }
 
@@ -73,6 +78,9 @@ section[id] {
    for hover, and only falls back to this for theme changes.
 --------------------------------------------------------------------------- */
 @media (prefers-reduced-motion: no-preference) {
+  /* html included so the page background still cross-fades now that it lives
+     there rather than on body. */
+  html,
   body,
   body * {
     transition:
@@ -158,73 +166,69 @@ section[id] {
 }
 
 /* ---------------------------------------------------------------------------
-   Hero pattern — decorative, aria-hidden in markup.
-   Animates transform/opacity only (compositor-friendly, no layout thrash).
-   The animation is *only* declared inside the no-preference query, so
-   `prefers-reduced-motion: reduce` leaves a completely static pattern.
+   About terminal.
+
+   The panel stays dark in BOTH themes — a light-on-white terminal reads wrong —
+   so it carries its own fixed palette instead of the swapping --bg/--text
+   tokens. Values measured against the panel fill:
+     text  11.8:1
+     dim    5.6:1  (0.55 alpha was tried first and fails AA at 4.3:1)
+
+   In dark mode the panel is only ~1.2:1 against the page background, so the
+   border is what separates the two, not the fill.
 --------------------------------------------------------------------------- */
 
-@keyframes hero-drift {
-  from {
-    transform: translate3d(0, 0, 0);
-  }
-  to {
-    transform: translate3d(-56px, -56px, 0);
-  }
+.terminal {
+  --term-bg: #0f1d27;
+  --term-text: #ead3aa;
+  --term-dim: rgb(234 211 170 / 0.65);
+  --term-rule: rgb(234 211 170 / 0.16);
+
+  background-color: var(--term-bg);
+  color: var(--term-text);
+  border: 1px solid var(--term-rule);
 }
 
-@keyframes hero-breathe {
+/* Prompts, the title bar, and the window dots — all use currentColor. */
+.terminal-dim {
+  color: var(--term-dim);
+}
+
+.terminal-quote {
+  border-left: 2px solid var(--term-rule);
+}
+
+@keyframes term-cursor {
   0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
   100% {
-    opacity: 0.55;
-  }
-  50% {
-    opacity: 0.9;
+    opacity: 0;
   }
 }
 
-/* Fades the pattern out toward the edges so it never reads as a bordered box
-   and never competes with the name for attention. The focal point sits at 75%
-   — densest on the outer edge, dissolving toward the text column on the left. */
-.hero-pattern {
-  position: relative;
-  overflow: hidden;
-  mask-image: radial-gradient(115% 100% at 75% 50%, #000 20%, transparent 76%);
-}
-
-/* Oversized so the drifting tile never exposes an edge. */
-.hero-layer {
-  position: absolute;
-  inset: -25%;
-  will-change: transform;
-}
-
-/* Both tile sizes divide the 56px drift distance evenly, so each animation
-   cycle lands exactly on the tile boundary and the loop is seamless. */
-.hero-layer--grid {
-  background-image:
-    repeating-linear-gradient(to right, var(--pattern-line) 0 1px, transparent 1px 56px),
-    repeating-linear-gradient(to bottom, var(--pattern-line) 0 1px, transparent 1px 56px);
-}
-
-.hero-layer--dots {
-  background-image: radial-gradient(var(--pattern-line) 1.5px, transparent 1.6px);
-  background-size: 28px 28px;
-  opacity: 0.55;
+.terminal-cursor {
+  display: inline-block;
+  width: 0.55em;
+  height: 1.05em;
+  vertical-align: text-bottom;
+  background-color: var(--term-text);
 }
 
 @media (prefers-reduced-motion: no-preference) {
+  /* steps(1) gives a hard on/off blink rather than a fade. Under `reduce` the
+     cursor simply sits solid. */
+  .terminal-cursor {
+    animation: term-cursor 1.1s steps(1) infinite;
+  }
+}
+
+/* The hero's CSS pattern was replaced by HeroCanvas, so its layers, masks and
+   keyframes are gone. The reduced-motion guard stays for smooth scrolling. */
+@media (prefers-reduced-motion: no-preference) {
   html {
     scroll-behavior: smooth;
-  }
-
-  .hero-layer--grid {
-    animation: hero-drift 34s linear infinite;
-  }
-
-  .hero-layer--dots {
-    animation:
-      hero-drift 56s linear infinite reverse,
-      hero-breathe 16s ease-in-out infinite;
   }
 }

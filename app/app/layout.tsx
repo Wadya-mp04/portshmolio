@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import ThemeProvider from '@/components/ThemeProvider';
+import BackgroundCanvas from '@/components/BackgroundCanvas';
 import './globals.css';
 
 // TODO: replace with real content
@@ -35,8 +36,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     // suppressHydrationWarning: next-themes sets the `dark` class on <html>
     // before React hydrates, which is a deliberate server/client mismatch.
     <html lang="en" suppressHydrationWarning>
-      <body className="bg-background text-foreground antialiased">
-        <ThemeProvider>{children}</ThemeProvider>
+      {/* No bg-* here on purpose: the page background lives on <html> so the
+          -z-10 BackgroundCanvas can paint above it. A background on body would
+          paint later and hide the canvas. */}
+      <body className="text-foreground antialiased">
+        <ThemeProvider>
+          <BackgroundCanvas />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

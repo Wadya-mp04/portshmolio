@@ -16,6 +16,9 @@ const entries: Education[] = [
       'Information Retrieval',
       'Computer Vision',
       'Web Development',
+      "Object Oriented Porgramming (Java)",
+      "Machine Learning",
+      "Software Engineering"
     ],
     notes: 'GPA: 3.6/4.3',
   },
@@ -25,7 +28,7 @@ const entries: Education[] = [
     location: 'Sharjah, UAE',
     start: '2022-09',
     end: '2023-04',
-    coursework: [],
+    coursework: ["Object Oriented Porgramming (C++)"],
     notes: 'GPA: 3.9/4.0',
   },
 

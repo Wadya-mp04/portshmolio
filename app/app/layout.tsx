@@ -5,8 +5,8 @@ import './globals.css';
 
 // TODO: replace with real content
 const SITE = {
-  name: 'Your Name',
-  title: 'Your Name — Portfolio',
+  name: 'Waddah Daker',
+  title: 'Waddah Daker — Portfolio',
   description:
     'Placeholder description. Software engineer portfolio: experience, projects, skills, and a daily Sudoku.',
   url: 'https://example.com',

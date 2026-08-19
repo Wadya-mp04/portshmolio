@@ -134,7 +134,7 @@ export default function ExperienceScroller({ roles }: { roles: Experience[] }) {
                   {role.tech.map((item) => (
                     <li
                       key={item}
-                      className="rounded border border-foreground/15 px-2 py-0.5 font-mono text-xs text-muted"
+                      className="tag"
                     >
                       {item}
                     </li>

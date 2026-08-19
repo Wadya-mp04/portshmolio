@@ -20,11 +20,11 @@ export default function ExperienceSection() {
       // `hidden` would make this their scroll container and break both.
       className="w-full overflow-x-clip py-16"
     >
-      <div className="mx-auto w-full max-w-5xl px-6">
+      <div className="mx-auto w-full max-w-5xl px-6 lg:max-w-6xl">
         {/* 19rem, not 14rem: "./EXPERIENCE" is 12 characters, and at text-3xl
             with 0.2em tracking a mono glyph advances ~24px — ~288px of label.
             gap-20 pushes the timeline further from it. */}
-        <div className="lg:grid lg:grid-cols-[minmax(0,19rem)_minmax(0,1fr)] lg:gap-20">
+        <div className="lg:grid lg:grid-cols-[minmax(0,19rem)_minmax(0,1fr)] lg:gap-12">
           {/* Mirrors .xp-stage exactly — sticky at top-0, one viewport tall,
               contents vertically centred. Because it pins on the same terms as
               the roles it never appears to travel: it is simply stationary for

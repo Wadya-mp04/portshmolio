@@ -30,6 +30,57 @@
   --muted: rgb(234 211 170 / 0.7);
 }
 
+/* ---------------------------------------------------------------------------
+   ALTERNATE PALETTE — beige / olive. Experimental.
+
+   Enable by adding class="theme-olive" to <html> (devtools, or the tag in
+   layout.tsx). Everything downstream reads the four semantic tokens and never a
+   hex, so overriding them here is the entire change.
+
+   Why --text and --accent diverge here, unlike the navy scheme where they are
+   identical: olive is intrinsically mid-luminance. A true olive (#556b2f) is
+   only 4.18:1 on this beige and fails AA as body text, but non-text UI needs
+   just 3:1 — so the accent stays properly olive for the logo, markers, rules
+   and progress bar, while body copy uses a deeper olive that passes AAA.
+
+   Measured:
+     light  text 8.5:1   accent 4.2:1 (UI only)   muted 5.8:1
+     dark   text 10.5:1  muted 5.9:1
+   --muted runs at 0.85 rather than 0.75; 0.75 measured 4.52:1, too close to the
+   AA floor to be safe.
+--------------------------------------------------------------------------- */
+
+.theme-olive {
+  --bg: #f0d5a4;
+  --text: #2f3a1c;
+  --accent: #556b2f;
+  --muted: rgb(47 58 28 / 0.85);
+}
+
+/* Specificity (0,2,0) beats the plain .dark rule above, so no ordering games. */
+.theme-olive.dark {
+  --bg: #222a15;
+  --text: #f0d5a4;
+  --accent: #8a9e57;
+  --muted: rgb(240 213 164 / 0.7);
+}
+
+/* The terminal keeps its own fixed palette, so it needs an olive counterpart —
+   a navy pane would read as a leftover from the other scheme. */
+.theme-olive .terminal {
+  --term-bg: #151a0d;
+  --term-text: #f0d5a4;
+  --term-dim: rgb(240 213 164 / 0.65);
+  --term-rule: rgb(240 213 164 / 0.16);
+}
+
+/* The mauve highlight was tuned against navy; on deep olive it drops to 4.08:1
+   and fails AA. This warmer tan restores it. */
+.theme-olive ::selection {
+  background-color: #d6b98f;
+  color: #2f3a1c;
+}
+
 /* Bridge the tokens into Tailwind's color scale, so `bg-background`,
    `text-foreground`, `text-muted`, `border-accent` etc. all resolve per theme.
    `inline` matters: it inlines `var(--bg)` into each utility rather than
@@ -247,6 +298,12 @@ section[id] {
   @apply font-mono text-2xl uppercase tracking-[0.2em] text-muted sm:text-3xl;
 }
 
+/* Tech stacks, coursework and skills all render as these. One definition so
+   they stay identical across the four sections that use them. */
+.tag {
+  @apply rounded border border-foreground/20 px-2.5 py-1 font-mono text-sm text-muted;
+}
+
 /* --- shared vertical timeline -------------------------------------------- */
 /* Used by Education as-is, and by Experience as its unpinned presentation. */
 
@@ -352,7 +409,7 @@ section[id] {
 
   .xp-track .tl-item {
     grid-area: 1 / 1;
-    padding-left: 3rem;
+    padding-left: 2rem;
     padding-bottom: 0;
     transition:
       opacity 350ms ease,

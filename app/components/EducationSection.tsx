@@ -44,7 +44,7 @@ export default function EducationSection() {
                 {item.coursework.map((course) => (
                   <li
                     key={course}
-                    className="rounded border border-foreground/15 px-2 py-0.5 font-mono text-xs text-muted"
+                    className="tag"
                   >
                     {course}
                   </li>

@@ -83,11 +83,24 @@ export const educationSchema = z.object({
 
 export const projectSchema = z.object({
   name: nonEmpty('name'),
+  /**
+   * One or two sentences. There is deliberately no bullet list: Experience
+   * already carries the bullet-by-bullet narrative, and repeating that shape
+   * here made the two sections read as the same content twice.
+   */
   summary: nonEmpty('summary'),
+  /** Projects are dated by year alone — month precision is noise on side work. */
+  year: z.string().regex(/^\d{4}$/, 'expected a 4-digit year, e.g. "2026"'),
   tech: z.array(nonEmpty('tech')),
-  highlights: z.array(nonEmpty('highlight')),
-  repoUrl: z.url().optional(),
-  liveUrl: z.url().optional(),
+  /**
+   * Required, unlike every other URL in this file. A project with nothing to
+   * read is a claim rather than a portfolio entry, so the build refuses it.
+   */
+  repoUrl: z.url(),
+  /** Walkthrough video, linked out rather than embedded. */
+  demoUrl: z.url().optional(),
+  /** Hackathon writeup. */
+  devpostUrl: z.url().optional(),
 });
 
 export const skillGroupSchema = z.object({

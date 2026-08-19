@@ -460,6 +460,35 @@ section[id] {
     line-height: 1;
     user-select: none;
     pointer-events: none;
+    /* Animating `translate` rather than `transform` because the -50% vertical
+       centring above lives on that property; using transform would mean
+       restating the centring in every state below. */
+    transition:
+      opacity 260ms ease,
+      translate 260ms ease;
+  }
+
+  /* Logo swap, in two beats: the outgoing logo shifts left and fades, then the
+     incoming one arrives from the left once its first frame exists. Sequential
+     rather than a crossfade, so only one WebGL context is ever live.
+
+     260ms is mirrored by EXIT_MS in ExperienceScroller, which decides when to
+     unmount the outgoing logo. The two have to agree or the swap will either
+     cut off early or hang on an invisible element. */
+  .xp-logo[data-phase='out'] {
+    opacity: 0;
+    translate: -3rem -50%;
+  }
+
+  /* The arriving logo's starting position: parked left, invisible.
+
+     `transition: none` is load-bearing. Without it the element would animate
+     INTO this state as it mounts — sliding leftwards out of the resting
+     position, i.e. the exit again, before playing the entrance. */
+  .xp-logo[data-phase='enter'] {
+    opacity: 0;
+    translate: -3rem -50%;
+    transition: none;
   }
 }
 

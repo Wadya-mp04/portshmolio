@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import dynamic from 'next/dynamic';
 import type { Experience } from '@/content/types';
 import { formatRange } from '@/lib/format';
@@ -13,6 +13,13 @@ const LogoAscii = dynamic(() => import('@/components/LogoAscii'), { ssr: false }
 
 /** Pinned mode is opt-in: wide viewport AND no reduced-motion preference. */
 const PINNED_QUERY = '(min-width: 64rem) and (prefers-reduced-motion: no-preference)';
+
+/**
+ * How long the outgoing logo is kept mounted so it can play its exit.
+ * Must match the .xp-logo transition duration in globals.css — too short cuts
+ * the animation off, too long holds an already-invisible element on screen.
+ */
+const EXIT_MS = 260;
 
 function subscribe(onChange: () => void) {
   const query = window.matchMedia(PINNED_QUERY);
@@ -85,6 +92,43 @@ export default function ExperienceScroller({ roles }: { roles: Experience[] }) {
 
   const activeLogo = roles[activeIndex]?.logo;
 
+  /**
+   * The logo actually mounted, which lags `activeLogo` by one exit animation.
+   *
+   * Without the lag there is nothing to animate: changing the key unmounts the
+   * outgoing logo in the same commit, so it would vanish rather than leave.
+   */
+  const [shownLogo, setShownLogo] = useState(activeLogo);
+  const [logoReady, setLogoReady] = useState(false);
+
+  /**
+   * Stable identity is required, not just tidy: LogoAscii lists this in its
+   * effect deps, so a fresh function each render would tear down and rebuild
+   * the WebGL context on every scroll frame.
+   */
+  const handleLogoReady = useCallback(() => setLogoReady(true), []);
+
+  // Hold the outgoing logo for its exit, then swap. Scrolling back across the
+  // boundary mid-exit clears the timer and re-targets, so a quick reversal
+  // settles on the right logo instead of racing.
+  useEffect(() => {
+    if (shownLogo === activeLogo) return;
+
+    // Deferred rather than set inline, so the state change lands outside the
+    // effect body (react-hooks/set-state-in-effect).
+    const timer = setTimeout(() => {
+      setShownLogo(activeLogo);
+      setLogoReady(false);
+    }, EXIT_MS);
+
+    return () => clearTimeout(timer);
+  }, [activeLogo, shownLogo]);
+
+  // 'enter' is the arriving logo parked left and invisible; it stays there
+  // until onReady confirms a frame has painted, which is what stops the fade
+  // from revealing an empty element while the SVG is still loading.
+  const logoPhase = shownLogo !== activeLogo ? 'out' : logoReady ? 'in' : 'enter';
+
   return (
     <div
       ref={trackRef}
@@ -101,7 +145,14 @@ export default function ExperienceScroller({ roles }: { roles: Experience[] }) {
         {/* One renderer for the whole section, showing the active role's logo.
             Per-role canvases would mean N WebGL contexts with N-1 of them
             drawing something invisible, since only one role is ever shown. */}
-        {pinned && activeLogo && <LogoAscii key={activeLogo} src={activeLogo} />}
+        {pinned && shownLogo && (
+          <LogoAscii
+            key={shownLogo}
+            src={shownLogo}
+            phase={logoPhase}
+            onReady={handleLogoReady}
+          />
+        )}
 
         <ol className="xp-list">
           {roles.map((role, index) => (

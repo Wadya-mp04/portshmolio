@@ -2,6 +2,12 @@ import { certificationSchema, validate, type Certification } from '@/content/typ
 
 const entries: Certification[] = [
   {
+    name: 'Docker for the Absolute Beginner - Hands On - DevOps',
+    issuer: 'Udemy',
+    status:'in-progress',
+    credentialUrl: 'https://www.udemy.com/course/learn-docker/'
+  },
+  {
     name: 'AWS Certified Solutions Architect – Associate',
     issuer: 'Amazon Web Services',
     status: 'completed',

@@ -80,9 +80,25 @@ function isBackgroundFill(fill: string | undefined): boolean {
   return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255 > MAX_INK_LUMINANCE;
 }
 
-type Props = { src: string };
+type Props = {
+  src: string;
+  /**
+   * Transition state, surfaced as `data-phase` for globals.css to style. Owned
+   * by the parent because only it knows which logo is leaving and which is
+   * arriving; this component just wears the attribute.
+   */
+  phase?: 'out' | 'enter' | 'in';
+  /**
+   * Fired once the first frame is actually on screen.
+   *
+   * The load is async, so mounting and being visible are far apart. Without
+   * this the parent would reveal an empty element and the ASCII would appear
+   * partway through the fade — the same abrupt switch, just later.
+   */
+  onReady?: () => void;
+};
 
-export default function LogoAscii({ src }: Props) {
+export default function LogoAscii({ src, phase, onReady }: Props) {
   const hostRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -222,9 +238,13 @@ export default function LogoAscii({ src }: Props) {
         pivot.scale.setScalar(2 / Math.max(extent.x, extent.y, extent.z));
 
         size();
-        // Reduced motion still gets the artwork — one frame, then nothing moves.
-        if (reduced) render();
-        else start();
+        // Render before signalling, not after: onReady tells the parent it is
+        // safe to fade this in, and that is only true once pixels exist.
+        // Reduced motion still gets the artwork — this one frame, then nothing
+        // moves.
+        render();
+        onReady?.();
+        if (!reduced) start();
       },
       undefined,
       () => {
@@ -268,9 +288,12 @@ export default function LogoAscii({ src }: Props) {
       renderer.dispose();
       output.domElement.remove();
     };
-  }, [src]);
+    // onReady is in deps because the effect calls it. The parent passes a
+    // useCallback-stabilised function, so this does not re-run per render —
+    // an unstable one would tear down and reload the whole scene.
+  }, [src, onReady]);
 
   // aria-hidden and unselectable: with ASCII on this is a large subtree of text
   // that would otherwise be read aloud and be highlightable.
-  return <div ref={hostRef} aria-hidden="true" className="xp-logo" />;
+  return <div ref={hostRef} aria-hidden="true" className="xp-logo" data-phase={phase} />;
 }

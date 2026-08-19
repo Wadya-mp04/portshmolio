@@ -35,8 +35,10 @@ const MAX_NODES = 260;
 const LINK_RATIO = 1.35;
 
 // Background artwork, so these stay well below the 4.5:1 that *content* needs.
-const DOT_ALPHA = 0.08;
-const LINE_ALPHA = 0.04;
+// At 0.08 the dots measured ~1.15:1 against the page — technically present but
+// below the threshold most people perceive as texture. Roughly doubled.
+const DOT_ALPHA = 0.15;
+const LINE_ALPHA = 0.075;
 const DOT_RADIUS = 1.2;
 const DRIFT = 0.22;
 

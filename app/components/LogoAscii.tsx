@@ -91,7 +91,19 @@ export default function LogoAscii({ src }: Props) {
 
     const scene = new Scene();
     const camera = new PerspectiveCamera(45, 1, 0.1, 100);
-    camera.position.z = 3.6;
+    /**
+     * Frames the model at ~86% of the view rather than 67%.
+     *
+     * The wasted margin was costing three things at once: the logo looked
+     * smaller than its element, `right:` offsets did not mean what they
+     * appeared to, and AsciiEffect spent roughly half its character grid
+     * rendering empty space.
+     *
+     * Not tighter than this: the shape rotates, and a flat extrusion projects
+     * wider at ~45° than face-on, so framing it edge-to-edge at rest would clip
+     * the corners mid-spin.
+     */
+    camera.position.z = 2.8;
 
     const renderer = new WebGLRenderer({ antialias: !ASCII, alpha: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));

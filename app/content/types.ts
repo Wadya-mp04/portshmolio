@@ -22,6 +22,19 @@ const yearMonth = z
   .string()
   .regex(/^\d{4}-(0[1-9]|1[0-2])$/, 'expected a "YYYY-MM" date, e.g. "2024-03"');
 
+/**
+ * Certifications are commonly published with a year and no month, so theirs is
+ * the one date that may carry either precision. Kept separate from yearMonth so
+ * relaxing it here cannot weaken the guarantee Experience and Education rely on.
+ * Pairs with formatIssued() in lib/format.
+ */
+const yearOrMonth = z
+  .string()
+  .regex(
+    /^\d{4}(-(0[1-9]|1[0-2]))?$/,
+    'expected "YYYY" or "YYYY-MM", e.g. "2025" or "2025-03"',
+  );
+
 const nonEmpty = (label: string) => z.string().trim().min(1, `${label} cannot be empty`);
 
 export const experienceSchema = z.object({
@@ -82,14 +95,26 @@ export const skillGroupSchema = z.object({
   skills: z.array(nonEmpty('skill')).min(1, 'list at least one skill'),
 });
 
-export const certificationSchema = z.object({
-  name: nonEmpty('name'),
-  issuer: nonEmpty('issuer'),
-  issued: yearMonth,
-  /** Omit for credentials that don't lapse. */
-  expires: yearMonth.optional(),
-  credentialUrl: z.url().optional(),
-});
+export const certificationSchema = z
+  .object({
+    name: nonEmpty('name'),
+    issuer: nonEmpty('issuer'),
+    /** Drives the colour-coded tag on the card. */
+    status: z.enum(['completed', 'in-progress']),
+    /** Omitted while in progress — there is no issue date until it is earned. */
+    issued: yearOrMonth.optional(),
+    /** Omit for credentials that don't lapse. */
+    expires: yearOrMonth.optional(),
+    /** The whole card links here; without it the card renders unlinked. */
+    credentialUrl: z.url().optional(),
+  })
+  // Cross-field, so it cannot live on `issued` itself: optional is only correct
+  // while in progress, and a completed credential with no date would otherwise
+  // render a card with a status tag and nothing to date it by.
+  .refine((cert) => cert.status !== 'completed' || cert.issued !== undefined, {
+    error: 'a completed certification needs an "issued" date',
+    path: ['issued'],
+  });
 
 /** One `$ command` plus the output it prints, in the About terminal. */
 export const terminalCommandSchema = z.object({

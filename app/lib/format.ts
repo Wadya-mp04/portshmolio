@@ -23,6 +23,16 @@ export function formatRange(start: string, end: string | null): string {
   return `${formatMonth(start)} — ${end ? formatMonth(end) : 'Present'}`;
 }
 
+/**
+ * Certifications are commonly published with a year and no month, so their
+ * schema accepts "2025" as well as "2025-03". Renders whatever precision it was
+ * given rather than inventing a month — formatMonth alone would read the
+ * missing half as NaN and print "undefined 2025".
+ */
+export function formatIssued(value: string): string {
+  return value.includes('-') ? formatMonth(value) : value;
+}
+
 /** Elapsed seconds as "m:ss" — used by the Sudoku timer. */
 export function formatDuration(totalSeconds: number): string {
   const minutes = Math.floor(totalSeconds / 60);

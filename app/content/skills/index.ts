@@ -67,6 +67,7 @@ const entries: SkillGroup[] = [
       'Wireshark',
       'ESLint',
       'SketchUp',
+      'Jupyter Notebook'
     ],
   },
 

@@ -92,6 +92,22 @@
   --color-muted: var(--muted);
 }
 
+/* Space Grotesk, loaded and self-hosted by next/font in layout.tsx, which
+   exposes it as --font-space-grotesk on <html>.
+
+   Overriding Tailwind's --font-sans rather than declaring font-family anywhere
+   means every existing `font-sans` utility and the default body font resolve to
+   it, with no component touched. The mono stack is deliberately left alone —
+   the ./headers, tags and terminal still want a monospace.
+
+   Kept out of the `@theme inline` block above on purpose: `inline` stops
+   Tailwind emitting --font-sans as a real custom property, and Tailwind's own
+   --default-font-family references it. That reference is what sets the body
+   font, so inlining here would leave body text on the system stack. */
+@theme {
+  --font-sans: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+}
+
 /* The background sits on <html>, not <body>, on purpose. Painting order inside
    the root stacking context is: root background → negative z-index descendants
    → everything else. BackgroundCanvas lives at -z-10, so it draws above the
@@ -302,6 +318,88 @@ section[id] {
    they stay identical across the four sections that use them. */
 .tag {
   @apply rounded border border-foreground/20 px-2.5 py-1 font-mono text-sm text-muted;
+}
+
+/* --- resume button -------------------------------------------------------- */
+
+/* isolate creates a stacking context, so the paper's z-index is scoped to this
+   button and cannot end up behind the page background. */
+.resume-button {
+  position: relative;
+  display: inline-flex;
+  isolation: isolate;
+}
+
+/* Above the paper, and opaque: without a background the sheet would be visible
+   through the button at rest instead of hiding behind it. */
+.resume-button > a {
+  position: relative;
+  z-index: 1;
+  background-color: var(--bg);
+}
+
+/* A sheet with three ruled lines, drawn as background layers so the element
+   stays a single node. Sized smaller than the button so it is fully concealed
+   at rest — this is what makes it read as coming *out from under*. */
+.resume-paper {
+  position: absolute;
+  left: 50%;
+  bottom: 0.3rem;
+  z-index: 0;
+  width: 1.4rem;
+  height: 1.75rem;
+  translate: -50% 0;
+  border: 1px solid color-mix(in oklab, var(--accent) 45%, transparent);
+  border-radius: 2px;
+  background:
+    linear-gradient(var(--rule), var(--rule)) no-repeat 20% 28% / 60% 1px,
+    linear-gradient(var(--rule), var(--rule)) no-repeat 20% 50% / 60% 1px,
+    linear-gradient(var(--rule), var(--rule)) no-repeat 20% 72% / 38% 1px,
+    var(--bg);
+  --rule: color-mix(in oklab, var(--accent) 40%, transparent);
+  pointer-events: none;
+}
+
+/* All motion is confined here, so reduced-motion leaves the sheet parked
+   behind the button where it is never seen. */
+@media (prefers-reduced-motion: no-preference) {
+  .resume-paper {
+    transition:
+      translate 220ms cubic-bezier(0.34, 1.4, 0.64, 1),
+      rotate 220ms cubic-bezier(0.34, 1.4, 0.64, 1);
+  }
+
+  /* focus-within as well as hover: keyboard users get the same cue. */
+  .resume-button:hover .resume-paper,
+  .resume-button:focus-within .resume-paper {
+    translate: -50% -1.1rem;
+    rotate: -5deg;
+  }
+
+  /* Starts from the raised position rather than from rest — the pointer is on
+     the button when it is clicked, so the sheet is already peeking out. */
+  @keyframes resume-fly {
+    0% {
+      translate: -50% -1.1rem;
+      rotate: -5deg;
+      opacity: 1;
+    }
+    18% {
+      translate: -50% -2.1rem;
+      rotate: -9deg;
+    }
+    100% {
+      translate: -50% 110vh;
+      rotate: 16deg;
+      opacity: 0;
+    }
+  }
+
+  /* 110vh, not 100: the button sits mid-screen, so the sheet has to clear both
+     the distance to the bottom edge and its own height. */
+  .resume-paper[data-flying='true'] {
+    animation: resume-fly 780ms cubic-bezier(0.5, 0, 0.75, 0) forwards;
+  }
 }
 
 /* --- shared vertical timeline -------------------------------------------- */

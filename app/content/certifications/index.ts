@@ -2,18 +2,18 @@ import { certificationSchema, validate, type Certification } from '@/content/typ
 
 const entries: Certification[] = [
   {
-    name: 'Docker for the Absolute Beginner - Hands On - DevOps',
-    issuer: 'Udemy',
-    status:'in-progress',
-    credentialUrl: 'https://www.udemy.com/course/learn-docker/'
-  },
-  {
     name: 'AWS Certified Solutions Architect – Associate',
     issuer: 'Amazon Web Services',
     status: 'completed',
     // Year only, per the CV — set the month if you want "Mar 2026" instead.
     issued: '2026',
     credentialUrl: 'https://www.credly.com/badges/cbed6eac-832e-496e-9c23-2c28fc7cb77b',
+  },
+  {
+    name: 'Docker for the Absolute Beginner - Hands On - DevOps',
+    issuer: 'Udemy',
+    status:'in-progress',
+    credentialUrl: 'https://www.udemy.com/course/learn-docker/'
   },
   {
     name: 'Full-Stack Web Development',

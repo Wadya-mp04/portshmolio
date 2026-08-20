@@ -12,6 +12,7 @@ import {
   siGithub,
   siHtml5,
   siJavascript,
+  siJupyter,
   siLinux,
   siMysql,
   siNextdotjs,
@@ -80,6 +81,8 @@ const ICONS: Record<string, SimpleIcon> = {
   Git: siGit,
   GitHub: siGithub,
   Vite: siVite,
+  // Content says "Jupyter Notebook"; Simple Icons calls the mark "Jupyter".
+  'Jupyter Notebook': siJupyter,
   Postman: siPostman,
   Wireshark: siWireshark,
   ESLint: siEslint,

@@ -10,7 +10,9 @@ const SECTIONS = [
   { id: 'projects', label: 'Projects' },
   { id: 'skills', label: 'Skills' },
   { id: 'certifications', label: 'Certifications' },
-  { id: 'sudoku', label: 'Sudoku' },
+  // Sudoku is commented out in page.tsx; restore this entry alongside it.
+  // { id: 'sudoku', label: 'Sudoku' },
+  { id: 'contact', label: 'Contact' },
 ];
 
 export default function Nav() {

@@ -152,6 +152,21 @@ export const aboutSchema = z.object({
   commands: z.array(terminalCommandSchema).min(1, 'list at least one command'),
 });
 
+/**
+ * A single object rather than an array, like aboutSchema — validated with
+ * validateOne() below.
+ *
+ * Only the destinations are stored. The label a link shows ("linkedin.com/in/…")
+ * is derived from the URL at render time, so the two cannot drift into showing
+ * one address and navigating to another.
+ */
+export const contactSchema = z.object({
+  email: z.email(),
+  linkedinUrl: z.url(),
+  githubUrl: z.url(),
+});
+
+export type Contact = z.infer<typeof contactSchema>;
 export type TerminalCommand = z.infer<typeof terminalCommandSchema>;
 export type About = z.infer<typeof aboutSchema>;
 export type Experience = z.infer<typeof experienceSchema>;

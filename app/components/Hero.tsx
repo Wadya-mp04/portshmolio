@@ -1,3 +1,5 @@
+import ResumeButton from '@/components/ResumeButton';
+
 export default function Hero() {
   return (
     <section
@@ -35,20 +37,17 @@ export default function Hero() {
 
         <div className="mt-9 flex flex-wrap gap-3">
           <a
-            href="mailto:you@example.com"
+            href="#contact"
             className="rounded-md bg-foreground px-5 py-2.5 font-mono text-sm text-background transition duration-200 hover:opacity-85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent motion-safe:active:scale-95"
           >
             Get in touch
           </a>
 
-          {/* TODO: drop the file at app/public/resume.pdf — that directory does
-              not exist yet, so this 404s until you add it. */}
-          <a
-            href="/resume.pdf"
-            className="rounded-md border border-foreground/30 px-5 py-2.5 font-mono text-sm text-foreground transition duration-200 hover:border-foreground/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent motion-safe:active:scale-95"
-          >
-            Resume
-          </a>
+          {/* TODO: drop the file at app/public/resume.pdf. It is missing, and
+              because the link downloads rather than navigates, clicking it
+              currently saves Next's 404 page under that filename — a quiet
+              failure rather than a visible one. */}
+          <ResumeButton />
         </div>
       </div>
 

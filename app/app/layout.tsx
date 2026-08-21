@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Space_Grotesk } from 'next/font/google';
 import ThemeProvider from '@/components/ThemeProvider';
 import BackgroundCanvas from '@/components/BackgroundCanvas';
+import ClickSound from '@/components/ClickSound';
 import './globals.css';
 
 // TODO: replace with real content
@@ -61,6 +62,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="text-foreground antialiased">
         <ThemeProvider>
           <BackgroundCanvas />
+          {/* Renders nothing — mounted once here so a single delegated listener
+              covers every [data-click-sound] control on the page. */}
+          <ClickSound />
           {children}
         </ThemeProvider>
       </body>

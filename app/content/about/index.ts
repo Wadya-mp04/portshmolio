@@ -5,7 +5,7 @@ import { aboutSchema, validateOne, type About } from '@/content/types';
  * drops the backslash from unrecognised escapes (`\ ` becomes a plain space),
  * which would quietly shred the art.
  *
- * TODO: replace with your own banner — any figlet-style generator will do.
+ * Kept as WHOAMI rather than a name: it labels the first command below it.
  */
 const BANNER = String.raw`
 __        __ _   _   ___      _     __  __  ___
@@ -16,23 +16,35 @@ __        __ _   _   ___      _     __  __  ___
 `;
 
 const about: About = {
-  // TODO: replace with real content
   window: 'manifesto.sh — 80x24',
-  prompt: 'you@workstation:~$',
+  prompt: 'waddah@montreal:~$',
   banner: BANNER,
   commands: [
     {
       command: 'whoami',
       output: [
-        'One or two sentences on what you do and the kind of problems you work on.',
-        'A second paragraph if you want more room — each string here renders as its own paragraph.',
+        'Software engineer working across backend, full-stack and cloud infrastructure. Finishing a Computer Science degree at Concordia in Montreal, after a first year at the American University of Sharjah.',
       ],
     },
-    {
-      command: 'cat philosophy.txt',
-      style: 'quote',
-      output: ['A line you actually believe about building software. Replace this.'],
-    },
+    // {
+    //   command: 'cat focus.txt',
+    //   output: [
+    //     'Protocols and retrieval, mostly. A reliable transfer protocol written from scratch over raw UDP; a five-stage IR pipeline over Concordia’s thesis repository; three indexing architectures benchmarked over 21,578 Reuters documents.',
+    //     'The through line is building the thing rather than importing it.',
+    //   ],
+    // },
+    // {
+    //   // TODO: this line is the one piece of writing here that is not derived
+    //   // from the CV — it is a claim about what you believe, put in your voice.
+    //   // It is grounded in the work (four adversarial network scenarios, three
+    //   // benchmarked architectures, sub-millisecond latency measured rather than
+    //   // assumed), but rewrite it so it is actually yours.
+    //   command: 'cat philosophy.txt',
+    //   style: 'quote',
+    //   output: [
+    //     'Information wants to be free.',
+    //   ],
+    // },
 
     // ← add another command here
   ],

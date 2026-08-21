@@ -1,6 +1,9 @@
 import Nav from '@/components/Nav';
 import Hero from '@/components/Hero';
-import About from '@/components/About';
+// The terminal now lives in Hero's right column, which carries the #about
+// anchor. Restoring this section means removing that anchor from Hero, or two
+// elements would share one id.
+// import About from '@/components/About';
 import ExperienceSection from '@/components/ExperienceSection';
 import EducationSection from '@/components/EducationSection';
 import ProjectsSection from '@/components/ProjectsSection';
@@ -15,7 +18,7 @@ export default function Page() {
       <Nav />
       <main>
         <Hero />
-        <About />
+        {/* <About /> */}
         <ExperienceSection />
         <EducationSection />
         <ProjectsSection />

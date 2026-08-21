@@ -33,6 +33,7 @@ export default function ResumeButton() {
         // page mid-animation. This keeps the user here, so the sheet flying
         // down doubles as the download's own feedback.
         download="Waddah-Daker-Resume.pdf"
+        data-click-sound
         onClick={() => setFlight((count) => (count ?? 0) + 1)}
         className="rounded-md border border-foreground/30 px-5 py-2.5 font-mono text-sm text-foreground transition duration-200 hover:border-foreground/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent motion-safe:active:scale-95"
       >

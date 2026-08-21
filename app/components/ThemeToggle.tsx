@@ -18,6 +18,7 @@ export default function ThemeToggle() {
   return (
     <button
       type="button"
+      data-click-sound
       onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
       aria-label="Toggle light and dark theme"
       className="tt shrink-0 rounded-md px-2 py-1 font-mono text-sm text-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"

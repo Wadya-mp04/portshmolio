@@ -1,0 +1,76 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    # id-token: write is what lets the runner request the OIDC token that
+    # configure-aws-credentials exchanges for the role. Without it that step
+    # fails with "Credentials could not be loaded" rather than a permissions
+    # error, which is a confusing way to find out. contents: read is all the
+    # checkout needs; nothing here writes back to the repo.
+    permissions:
+      id-token: write
+      contents: read
+
+    # The Next project is not at the repo root — it sits in app/, alongside
+    # infra/ and lambdas/. This applies to `run` steps only, so the setup-node
+    # cache path below still has to be spelled out from the root.
+    defaults:
+      run:
+        working-directory: app
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          # Read from app/.nvmrc rather than pinned here, so CI and whatever
+          # nvm/fnm picks locally cannot disagree. Hardcoding the same number
+          # in both places is two sources of truth, not one. The file is the
+          # only pin the repo has — package.json declares no engines, and
+          # Next 16's own floor is merely >=20.9.0.
+          node-version-file: app/.nvmrc
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Install dependencies
+        # ci, not install: installs exactly the lockfile and fails if
+        # package.json and the lock have diverged, which is what you want in
+        # CI. It also wipes node_modules first, so no state carries over.
+        run: npm ci
+
+      - name: Build static export
+        # `output: 'export'` in next.config.ts, so this emits app/out.
+        run: npm run build
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Sync to S3
+        # `out` resolves to app/out via the working-directory default above.
+        #
+        # --delete removes anything in the bucket that is not in this export,
+        # which is what keeps deleted pages from lingering. It also means the
+        # bucket must hold nothing but the static site: if the Sudoku Lambda's
+        # artifacts ever land in the same bucket, this wipes them. Give that a
+        # separate bucket, or narrow this to a prefix.
+        run: aws s3 sync out "s3://${{ secrets.S3_BUCKET }}" --delete
+
+      - name: Invalidate CloudFront
+        # The export's filenames are content-hashed, but index.html and the
+        # other route documents are not, so without this the edge keeps
+        # serving the previous HTML until its TTL expires.
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id "${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}" \
+            --paths "/*"

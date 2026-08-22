@@ -33,7 +33,6 @@ export default function Hero() {
           terminal and starts reading as a mostly-empty panel. */}
       <div className="grid w-full items-center gap-12 lg:grid-cols-[26rem_minmax(0,1fr)] lg:gap-16 xl:grid-cols-[34rem_minmax(0,1fr)]">
         <div>
-          {/* TODO: replace with real content */}
           <p className="font-mono text-sm uppercase tracking-[0.2em] text-muted">
             Backend Developer
           </p>
@@ -44,9 +43,12 @@ export default function Hero() {
             Waddah Daker
           </h1>
 
+          {/* Deliberately does not restate the eyebrow above it, the location
+              pin below it, or the degree and certification the terminal covers
+              — all four are on screen at once now, so this earns its space by
+              saying what the work IS rather than who is doing it. */}
           <p className="mt-6 max-w-prose text-lg text-muted">
-            One line on what you build and who you build it for. Replace this with your
-            own positioning statement.
+            Building reliable systems from an information retrieval pipeline benchmarked across 21,578 documents to a production AWS deployment serving real traffic.
           </p>
 
           <p className="mt-5 flex items-center gap-2 font-mono text-sm text-muted">

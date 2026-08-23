@@ -50,6 +50,9 @@ jobs:
         # `output: 'export'` in next.config.ts, so this emits app/out.
         run: npm run build
 
+      - name: Debug secret length (no value exposed)
+        run: echo -n "${{ secrets.AWS_ROLE_ARN }}" | wc -c
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:

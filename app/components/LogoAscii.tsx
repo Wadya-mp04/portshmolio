@@ -200,7 +200,7 @@ export default function LogoAscii({ src, phase, onReady }: Props) {
         const usable = ink.length > 0 ? ink : data.paths;
 
         const shapes: Shape[] = [];
-        for (const path of usable) shapes.push(...SVGLoader.createShapes(path));
+        for (const path of usable) shapes.push(...path.toShapes());
 
         // Measure the flat outline first so depth can be derived from the
         // logo's own scale, before any geometry is built.

@@ -12,8 +12,9 @@ const entries: Certification[] = [
   {
     name: 'Docker for the Absolute Beginner - Hands On - DevOps',
     issuer: 'Udemy',
-    status:'in-progress',
-    credentialUrl: 'https://www.udemy.com/course/learn-docker/'
+    status:'completed',
+    issued: '2026',
+    credentialUrl: 'https://concordia.udemy.com/certificate/UC-bacf146e-a187-4605-9f18-5d492211a6e3/'
   },
   {
     name: 'Full-Stack Web Development',

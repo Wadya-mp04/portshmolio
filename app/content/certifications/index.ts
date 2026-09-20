@@ -17,7 +17,7 @@ const entries: Certification[] = [
     credentialUrl: 'https://concordia.udemy.com/certificate/UC-bacf146e-a187-4605-9f18-5d492211a6e3/'
   },
   {
-    name: 'Full-Stack Web Development',
+    name: 'The Complete Full-Stack Web Development Bootcamp',
     issuer: 'Udemy',
     status: 'completed',
     // Year only: the CV gives no month, and inventing one would put a date on

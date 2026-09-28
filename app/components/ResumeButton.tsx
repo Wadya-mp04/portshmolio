@@ -28,7 +28,7 @@ export default function ResumeButton() {
       />
 
       <a
-        href="/resume.pdf"
+        href="/Waddah_Daker_CV.pdf"
         // `download` rather than a plain link: navigating away would unload the
         // page mid-animation. This keeps the user here, so the sheet flying
         // down doubles as the download's own feedback.

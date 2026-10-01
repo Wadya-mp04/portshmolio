@@ -8,11 +8,11 @@ const entries: Experience[] = [
     start: '2026-05',
     end: null, // null renders as "Present"
     bullets: [
-      'Architected and shipped a production bilingual (EN/AR) site on a Next.js/TypeScript monorepo with 15+ Sanity CMS schemas, powering ~5 live client-facing pages deployed on Vercel',
-      'Engineered a full i18n system (next-intl, dynamic [lang]/ routing) enabling seamless RTL/LTR content switching across the entire site for a global client base',
-      'Extending the platform with a companion AWS-native page (S3, CloudFront, Route 53), applying cloud infrastructure patterns beyond the core Vercel stack',
+      'Shipped a bilingual Next.js/TypeScript site with 15+ Sanity CMS schemas and RTL/LTR i18n ',
+      'Designed a serverless AWS recruitment portal (Lambda, DynamoDB, SES) for 3 branches, targeting $5/mo',
+      'Set up the firm’s AWS account from scratch with MFA-secured root and role-based, least-privilege IAM access',
     ],
-    tech: ['Next.js', 'TypeScript', 'Sanity CMS', 'Vercel'],
+    tech: ['Next.js', 'TypeScript', 'Sanity CMS', 'Vercel','AWS','Microsoft Entra ID'],
     logo: '/logos/awd-logo.svg',
   },
   {

@@ -65,10 +65,6 @@ export default function Hero() {
               Get in touch
             </a>
 
-            {/* TODO: drop the file at app/public/resume.pdf. It is missing, and
-                because the link downloads rather than navigates, clicking it
-                currently saves Next's 404 page under that filename — a quiet
-                failure rather than a visible one. */}
             <ResumeButton />
           </div>
         </div>

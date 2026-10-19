@@ -10,7 +10,7 @@ const SITE = {
   name: 'Waddah Daker',
   title: 'Waddah Daker — Portfolio',
   description:
-    'Placeholder description. Software engineer portfolio: experience, projects, skills, and a daily Sudoku.',
+    'Waddah Daker\'s portfolio: software engineer with experience in web development and design.',
   url: 'https://example.com',
 };
 
